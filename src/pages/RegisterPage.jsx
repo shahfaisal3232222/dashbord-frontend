@@ -1,7 +1,6 @@
 import React from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink , useNavigate} from 'react-router-dom'
 import  { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import axiosInstance from "../axiosInstance/axiosInstance";
 
 
@@ -15,7 +14,7 @@ export default function RegisterPage() {
     e.preventDefault();
 
     try {
-      const response = await axiosInstance.post("/register", {
+      const response = await axiosInstance.post("/api/user/register", {
         name,
         email,
         password,

@@ -1,8 +1,7 @@
 import React from 'react'
 import { useState } from "react";
-import { NavLink } from "react-router";
+import { NavLink , useNavigate} from "react-router-dom";
 import axiosInstance from "../axiosInstance/axiosInstance";
-import { useNavigate } from 'react-router';
 export default function LoginPage() {
 
   const [password, setPassword] = useState("");
@@ -17,7 +16,7 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const response = await axiosInstance.post("/login", {
+      const response = await axiosInstance.post("/api/user/login", {
      email , password
       });
 

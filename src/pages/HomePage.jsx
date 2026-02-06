@@ -34,7 +34,7 @@ export default function HomePage() {
     if (!title.trim()) return;
 
     try {
-      const res = await axiosInstance.post("/todos", { title });
+      const res = await axiosInstance.post("/api/todos", { title });
       setTodos([res.data.todo, ...todos]);
       setTitle("");
     } catch (error) {
@@ -44,7 +44,7 @@ export default function HomePage() {
 
   const toggleTodo = async (id, completed) => {
     try {
-      const res = await axiosInstance.put(`/todos/${id}`, {
+      const res = await axiosInstance.put(`/api/todos/${id}`, {
         completed: !completed,
       });
 
@@ -60,7 +60,7 @@ export default function HomePage() {
 
   const deleteTodo = async (id) => {
     try {
-      await axiosInstance.delete(`/todos/${id}`);
+      await axiosInstance.delete(`/api/todos/${id}`);
       setTodos(todos.filter((todo) => todo._id !== id));
     } catch (error) {
       console.log(error);
