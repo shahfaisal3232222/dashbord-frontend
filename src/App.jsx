@@ -1,9 +1,9 @@
 import React from "react";
 import { Route , Routes } from "react-router-dom";
-import LoginPage from "./pages/loginPage";
-import Authenticated from "./routes/authenticated";
-import RegisterPage from "./pages/registerPage";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
 import HomePage from "./pages/HomePage";
+import Authenticated from "./routes/authenticated";
 function App() {
 
   return (
