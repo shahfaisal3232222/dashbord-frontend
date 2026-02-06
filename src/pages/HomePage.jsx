@@ -17,7 +17,7 @@ export default function HomePage() {
   const fetchTodos = async () => {
     try {
       setLoading(true);
-      const res = await axiosInstance.get("/todos");
+      const res = await axiosInstance.get("/api/todos");
       setTodos(res.data.todos || []);
     } catch (error) {
       console.log(error);
