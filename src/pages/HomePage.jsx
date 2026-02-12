@@ -82,89 +82,99 @@ export default function HomePage() {
     loadTodos();
   }, [navigate]);
   /* ================= UI ================= */
-  return (
-    <div className="min-h-screen bg-gradient- from-orange-100 to-orange-200 p-6">
-      {/* Header */}
-      <div className="max-w-3xl mx-auto flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-800">
-          📝 My Todos
+ return (
+  <div className="min-h-screen bg-gradient-to-br from-slate-100 via-gray-100 to-slate-200 p-6">
+    
+    {/* Header */}
+    <div className="max-w-4xl mx-auto flex justify-between items-center mb-10">
+      <div>
+        <h1 className="text-4xl font-bold text-slate-800">
+          My Tasks
         </h1>
-        <button
-          onClick={handleLogout}
-          className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg"
-        >
-          Logout
-        </button>
+        <p className="text-slate-500 mt-1">
+          Organize your day efficiently
+        </p>
       </div>
 
-      {/* Add Todo */}
-      <form
-        onSubmit={addTodo}
-        className="max-w-3xl mx-auto bg-white p-6 rounded-2xl shadow-lg flex gap-4"
+      <button
+        onClick={handleLogout}
+        className="bg-rose-500 hover:bg-rose-600 text-white px-5 py-2.5 rounded-xl font-medium shadow-md transition"
       >
-        <input
-          type="text"
-          placeholder="What do you need to do?"
-          className="flex-1 border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
-        <button
-          type="submit"
-          className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg font-semibold"
-        >
-          Add
-        </button>
-      </form>
-
-      {/* Todo List */}
-      <div className="max-w-3xl mx-auto mt-6 space-y-4">
-        {loading && (
-          <p className="text-center text-gray-600">
-            Loading todos...
-          </p>
-        )}
-
-        {!loading && todos.length === 0 && (
-          <p className="text-center text-gray-600">
-            No todos yet. Add one 
-          </p>
-        )}
-
-        {todos.map((todo) => (
-          <div
-            key={todo._id}
-            className="bg-white p-4 rounded-xl shadow flex items-center justify-between"
-          >
-            <div className="flex items-center gap-3">
-              <input
-                type="checkbox"
-                checked={todo.completed}
-                onChange={() =>
-                  toggleTodo(todo._id, todo.completed)
-                }
-                className="w-5 h-5 accent-orange-500"
-              />
-              <span
-                className={`text-lg ${
-                  todo.completed
-                    ? "line-through text-gray-400"
-                    : "text-gray-800"
-                }`}
-              >
-                {todo.title}
-              </span>
-            </div>
-
-            <button
-              onClick={() => deleteTodo(todo._id)}
-              className="text-red-500 hover:text-red-700 font-semibold"
-            >
-              Delete
-            </button>
-          </div>
-        ))}
-      </div>
+        Logout
+      </button>
     </div>
-  );
+
+    {/* Add Todo Card */}
+    <form
+      onSubmit={addTodo}
+      className="max-w-4xl mx-auto bg-white/90 backdrop-blur-xl p-6 rounded-2xl shadow-xl flex gap-4"
+    >
+      <input
+        type="text"
+        placeholder="Add a new task..."
+        className="flex-1 border border-gray-200 rounded-xl px-4 py-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+      />
+
+      <button
+        type="submit"
+        className="bg-indigo-500 hover:bg-indigo-600 text-white px-7 py-3 rounded-xl font-semibold shadow-md transition"
+      >
+        Add Task
+      </button>
+    </form>
+
+    {/* Todo List */}
+    <div className="max-w-4xl mx-auto mt-8 space-y-4">
+      {loading && (
+        <p className="text-center text-slate-500">
+          Loading your tasks...
+        </p>
+      )}
+
+      {!loading && todos.length === 0 && (
+        <div className="text-center text-slate-500 bg-white p-6 rounded-xl shadow">
+          No tasks yet. Start by adding one ✨
+        </div>
+      )}
+
+      {todos.map((todo) => (
+        <div
+          key={todo._id}
+          className="bg-white p-5 rounded-2xl shadow-md flex items-center justify-between hover:shadow-lg transition"
+        >
+          <div className="flex items-center gap-4">
+            <input
+              type="checkbox"
+              checked={todo.completed}
+              onChange={() =>
+                toggleTodo(todo._id, todo.completed)
+              }
+              className="w-5 h-5 accent-indigo-500"
+            />
+
+            <span
+              className={`text-lg ${
+                todo.completed
+                  ? "line-through text-gray-400"
+                  : "text-slate-800"
+              }`}
+            >
+              {todo.title}
+            </span>
+          </div>
+
+          <button
+            onClick={() => deleteTodo(todo._id)}
+            className="text-rose-500 hover:text-rose-700 font-medium transition"
+          >
+            Delete
+          </button>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
 }

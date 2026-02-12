@@ -21,7 +21,7 @@ export default function LoginPage() {
       });
 
       const data =  response.data;
-      // console.log("API Response:", data);
+      console.log("API Response:", data);
 
      if (data.isSuccess) {
   if (data?.token) {
