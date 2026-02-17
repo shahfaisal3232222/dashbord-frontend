@@ -86,23 +86,32 @@ export default function HomePage() {
   <div className="min-h-screen bg-gradient-to-br from-slate-100 via-gray-100 to-slate-200 p-6">
     
     {/* Header */}
-    <div className="max-w-4xl mx-auto flex justify-between items-center mb-10">
-      <div>
-        <h1 className="text-4xl font-bold text-slate-800">
-          My Tasks
-        </h1>
-        <p className="text-slate-500 mt-1">
-          Organize your day efficiently
-        </p>
-      </div>
+   <div className="max-w-4xl mx-auto flex justify-between items-center mb-10">
+  <div>
+    <h1 className="text-4xl font-bold text-slate-800">
+      My Tasks
+    </h1>
+    <p className="text-slate-500 mt-1">
+      Organize your day efficiently
+    </p>
+  </div>
 
-      <button
-        onClick={handleLogout}
-        className="bg-rose-500 hover:bg-rose-600 text-white px-5 py-2.5 rounded-xl font-medium shadow-md transition"
-      >
-        Logout
-      </button>
-    </div>
+  <div className="flex gap-3">
+    <button
+      onClick={() => navigate("/profile")}
+      className="bg-indigo-500 hover:bg-indigo-600 text-white px-5 py-2.5 rounded-xl font-medium shadow-md transition"
+    >
+      Profile
+    </button>
+    
+    <button
+      onClick={handleLogout}
+      className="bg-rose-500 hover:bg-rose-600 text-white px-5 py-2.5 rounded-xl font-medium shadow-md transition"
+    >
+      Logout
+    </button>
+  </div>
+</div>
 
     {/* Add Todo Card */}
     <form
