@@ -1,6 +1,7 @@
 import { useState } from "react";
 import React from "react";
 import axiosInstance from "../axiosInstance/axiosInstance";
+import getApiErrorMessage from "../utils/getApiErrorMessage";
 
 export default function ImageUpload({ currentAvatar, onUploadSuccess }) {
   const [selectedImage, setSelectedImage] = useState(null);
@@ -46,7 +47,7 @@ export default function ImageUpload({ currentAvatar, onUploadSuccess }) {
       }
     } catch (error) {
       console.error("Error uploading image:", error);
-      alert(error.response?.data?.message || "Error uploading image");
+      alert(getApiErrorMessage(error, "Error uploading image"));
     } finally {
       setUploading(false);
     }
@@ -63,7 +64,7 @@ export default function ImageUpload({ currentAvatar, onUploadSuccess }) {
       }
     } catch (error) {
       console.error("Error deleting avatar:", error);
-      alert("Error deleting avatar");
+      alert(getApiErrorMessage(error, "Error deleting avatar"));
     }
   };
 

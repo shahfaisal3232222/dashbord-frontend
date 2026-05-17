@@ -1,13 +1,16 @@
 import { useEffect, useState } from "react";
-import React from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../axiosInstance/axiosInstance";
+import getApiErrorMessage from "../utils/getApiErrorMessage";
 
 export default function HomePage() {
   const [todos, setTodos] = useState([]);
   const [title, setTitle] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
+
+  const isTodoCompleted = (todo) => Boolean(todo?.isCompleted ?? todo?.completed);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -17,13 +20,18 @@ export default function HomePage() {
   const fetchTodos = async () => {
     try {
       setLoading(true);
+      setError("");
       const res = await axiosInstance.get("/api/todos");
       setTodos(res.data.todos || []);
     } catch (error) {
       console.log(error);
+
       if (error.response?.status === 401) {
         handleLogout();
+        return;
       }
+
+      setError(getApiErrorMessage(error, "Unable to load your tasks right now."));
     } finally {
       setLoading(false);
     }
@@ -31,49 +39,61 @@ export default function HomePage() {
 
   const addTodo = async (e) => {
     e.preventDefault();
-    if (!title.trim()) return;
+
+    if (!title.trim()) {
+      return;
+    }
+
     try {
-      const res = await axiosInstance.post("/api/todos", { title });
-      setTodos([res.data.todo, ...todos]);
+      setError("");
+      const res = await axiosInstance.post("/api/todos", { title: title.trim() });
+      setTodos((currentTodos) => [res.data.todo, ...currentTodos]);
       setTitle("");
     } catch (error) {
       console.log(error);
+      setError(getApiErrorMessage(error, "Unable to create the task."));
     }
   };
 
-  const toggleTodo = async (id, completed) => {
+  const toggleTodo = async (id, isCompleted) => {
     try {
+      setError("");
       const res = await axiosInstance.put(`/api/todos/${id}`, {
-        completed: !completed,
+        isCompleted: !isCompleted,
       });
-      setTodos(todos.map((todo) => (todo._id === id ? res.data.todo : todo)));
+
+      setTodos((currentTodos) =>
+        currentTodos.map((todo) => (todo._id === id ? res.data.todo : todo))
+      );
     } catch (error) {
       console.log(error);
+      setError(getApiErrorMessage(error, "Unable to update the task."));
     }
   };
 
   const deleteTodo = async (id) => {
     try {
+      setError("");
       await axiosInstance.delete(`/api/todos/${id}`);
-      setTodos(todos.filter((todo) => todo._id !== id));
+      setTodos((currentTodos) => currentTodos.filter((todo) => todo._id !== id));
     } catch (error) {
       console.log(error);
+      setError(getApiErrorMessage(error, "Unable to delete the task."));
     }
   };
 
   useEffect(() => {
     const token = localStorage.getItem("token");
+
     if (!token) {
       navigate("/", { replace: true });
       return;
     }
-    const loadTodos = async () => {
-      await fetchTodos();
-    };
-    loadTodos();
+
+    fetchTodos();
   }, [navigate]);
 
-  const completedCount = todos.filter((t) => t.completed).length;
+  const completedCount = todos.filter(isTodoCompleted).length;
   const totalCount = todos.length;
   const progressPct = totalCount === 0 ? 0 : Math.round((completedCount / totalCount) * 100);
 
@@ -93,7 +113,6 @@ export default function HomePage() {
           overflow-x: hidden;
         }
 
-        /* ── Ambient background glows ── */
         .hp-root::before {
           content: '';
           position: fixed;
@@ -125,7 +144,6 @@ export default function HomePage() {
           padding: 48px 24px 80px;
         }
 
-        /* ── Header ── */
         .hp-header {
           display: flex;
           justify-content: space-between;
@@ -214,7 +232,6 @@ export default function HomePage() {
           color: #c7d2fe;
         }
 
-        /* ── Stats Row ── */
         .hp-stats {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
@@ -256,7 +273,6 @@ export default function HomePage() {
         .stat-value.accent { color: #6366f1; }
         .stat-value.green  { color: #34d399; }
 
-        /* ── Progress Bar ── */
         .hp-progress-wrap {
           margin-bottom: 32px;
           animation: fadeUp 0.6s 0.15s ease both;
@@ -293,7 +309,6 @@ export default function HomePage() {
           box-shadow: 0 0 10px rgba(99,102,241,0.5);
         }
 
-        /* ── Add Task Form ── */
         .hp-form {
           display: flex;
           gap: 10px;
@@ -342,7 +357,6 @@ export default function HomePage() {
         }
         .btn-add:active { transform: translateY(0); }
 
-        /* ── Section label ── */
         .section-label {
           font-size: 11px;
           text-transform: uppercase;
@@ -353,7 +367,6 @@ export default function HomePage() {
           animation: fadeUp 0.6s 0.25s ease both;
         }
 
-        /* ── Todo List ── */
         .hp-list {
           display: flex;
           flex-direction: column;
@@ -389,7 +402,6 @@ export default function HomePage() {
           min-width: 0;
         }
 
-        /* Custom checkbox */
         .todo-checkbox {
           width: 20px;
           height: 20px;
@@ -456,7 +468,6 @@ export default function HomePage() {
           background: rgba(248,113,113,0.1);
         }
 
-        /* ── Empty State ── */
         .empty-state {
           text-align: center;
           padding: 60px 20px;
@@ -473,7 +484,6 @@ export default function HomePage() {
           font-weight: 300;
         }
 
-        /* ── Loading ── */
         .loading-row {
           display: flex;
           align-items: center;
@@ -497,14 +507,12 @@ export default function HomePage() {
         .loader-dots span:nth-child(2) { animation-delay: 0.2s; }
         .loader-dots span:nth-child(3) { animation-delay: 0.4s; }
 
-        /* ── Divider ── */
         .hp-divider {
           height: 1px;
           background: rgba(255,255,255,0.05);
           margin: 32px 0;
         }
 
-        /* ── Animations ── */
         @keyframes fadeDown {
           from { opacity: 0; transform: translateY(-16px); }
           to   { opacity: 1; transform: translateY(0); }
@@ -519,10 +527,9 @@ export default function HomePage() {
         }
         @keyframes dotBounce {
           0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
-          40%            { transform: scale(1);   opacity: 1; }
+          40%            { transform: scale(1); opacity: 1; }
         }
 
-        /* ── Responsive ── */
         @media (max-width: 520px) {
           .hp-stats { grid-template-columns: repeat(3, 1fr); gap: 8px; }
           .stat-value { font-size: 20px; }
@@ -534,8 +541,6 @@ export default function HomePage() {
 
       <div className="hp-root">
         <div className="hp-inner">
-
-          {/* ── Header ── */}
           <div className="hp-header">
             <div className="hp-brand">
               <div className="hp-logo-row">
@@ -555,7 +560,6 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* ── Stats ── */}
           <div className="hp-stats">
             <div className="stat-card">
               <span className="stat-label">Total</span>
@@ -571,7 +575,6 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* ── Progress ── */}
           {totalCount > 0 && (
             <div className="hp-progress-wrap">
               <div className="progress-header">
@@ -586,7 +589,6 @@ export default function HomePage() {
 
           <div className="hp-divider" />
 
-          {/* ── Add Task ── */}
           <form className="hp-form" onSubmit={addTodo}>
             <input
               className="hp-input"
@@ -600,11 +602,12 @@ export default function HomePage() {
             </button>
           </form>
 
-          {/* ── List ── */}
+          {error && <p className="section-label" style={{ color: "#fca5a5" }}>{error}</p>}
+
           {!loading && todos.length > 0 && (
             <p className="section-label">
               {completedCount === totalCount && totalCount > 0
-                ? "All tasks completed 🎉"
+                ? "All tasks completed"
                 : `${totalCount - completedCount} task${totalCount - completedCount !== 1 ? "s" : ""} remaining`}
             </p>
           )}
@@ -621,38 +624,41 @@ export default function HomePage() {
 
             {!loading && todos.length === 0 && (
               <div className="empty-state">
-                <div className="empty-icon">✦</div>
+                <div className="empty-icon">*</div>
                 <p className="empty-text">No tasks yet. Add one above to get started.</p>
               </div>
             )}
 
-            {todos.map((todo) => (
-              <div
-                key={todo._id}
-                className={`todo-item${todo.completed ? " completed" : ""}`}
-              >
-                <div className="todo-left">
-                  <input
-                    className="todo-checkbox"
-                    type="checkbox"
-                    checked={todo.completed}
-                    onChange={() => toggleTodo(todo._id, todo.completed)}
-                  />
-                  <span className={`todo-text${todo.completed ? " done" : ""}`}>
-                    {todo.title}
-                  </span>
-                </div>
-                <button
-                  className="btn-delete"
-                  onClick={() => deleteTodo(todo._id)}
-                  title="Delete task"
-                >
-                  ×
-                </button>
-              </div>
-            ))}
-          </div>
+            {todos.map((todo) => {
+              const completed = isTodoCompleted(todo);
 
+              return (
+                <div
+                  key={todo._id}
+                  className={`todo-item${completed ? " completed" : ""}`}
+                >
+                  <div className="todo-left">
+                    <input
+                      className="todo-checkbox"
+                      type="checkbox"
+                      checked={completed}
+                      onChange={() => toggleTodo(todo._id, completed)}
+                    />
+                    <span className={`todo-text${completed ? " done" : ""}`}>
+                      {todo.title}
+                    </span>
+                  </div>
+                  <button
+                    className="btn-delete"
+                    onClick={() => deleteTodo(todo._id)}
+                    title="Delete task"
+                  >
+                    x
+                  </button>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </>
